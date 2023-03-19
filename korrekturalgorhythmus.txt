@@ -1,0 +1,52 @@
+let results = [];
+var stringArray = ["Hello", "Matthias", "Caytlin", "Bye", "Best", "Good"]
+
+console.log("stringArray vorher " + stringArray)
+
+var ignoreWords = ["Hello", "Bye", "Best", "Good"]
+
+for (let i = 0; i < stringArray.length; i++) {
+  if (ignoreWords.indexOf(stringArray[i]) !== -1) {
+    stringArray.splice(i, 1);
+    i--;
+  }
+}
+console.log("stringArray nachher " + stringArray)
+let bodyText = "This is a text that contains the word Caytlin, although it should be Caitlyn."
+
+function findWordsWithSameCapital(text) {
+
+  const regex = /\b([A-Z])[a-z]*\b/g;
+  const matches = text.match(regex);
+  
+  console.log(typeof matches)
+  if (matches) {
+      console.log("match = " + matches)
+      return matches
+    }
+  }
+  
+const wordsWithSameCapital = findWordsWithSameCapital(bodyText);
+console.log("wordsWithSameCapital ist gleich: ");
+console.log(wordsWithSameCapital)
+
+
+for (let i = 0; i < stringArray.length; i++) {
+  
+  var item = stringArray[i];
+  
+  for (let x = 0; x < wordsWithSameCapital.length; x++){
+      var itemToSpellcheck = wordsWithSameCapital[x]
+      if (item.charAt(0) === itemToSpellcheck.charAt(0) && 
+      item.charAt(item.length - 1) === itemToSpellcheck.charAt(itemToSpellcheck.length - 1)) {
+          
+          if (item === itemToSpellcheck){
+            console.log(item + " ist gleich " + itemToSpellcheck + ". Erfolgreich und kein Fehler!")
+          } else {
+            console.log(item + " und " + itemToSpellcheck + " sind nicht gleich! Fehler!")
+          }
+          
+      }
+    
+  }
+      }

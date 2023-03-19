@@ -1,0 +1,13 @@
+{
+    "contacts": [
+    {"email": "john.doe@gmail.com",
+        "name1": "John",
+        "name2": "Caytlin",
+        "name3": "Matthias"
+    },
+    {"email": "tocadisco@gmail.com",
+    "name1": "Matthew",
+    "name2": "Ingo",
+    "name3": "Willi"}
+    ]
+}
