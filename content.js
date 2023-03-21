@@ -1,3 +1,8 @@
+/**
+ * load typo.js to check grammaly spelling
+ */
+
+
 /** ==================================================================================== 
  * A debounce function makes sure that your code is only triggered once per user input.
  * =====================================================================================  */
@@ -40,16 +45,16 @@ var Dictionary = ["Hello", "Bye", "Best", "Good"]
 /**
  * function to check spell text (this is main function in this app)
  */
-const checkSpellText = () => {
+const checkSpellText = async() => {
     if (document.getElementsByClassName("oL aDm az9")) {
         console.log(" == start checking spell in Gmail.com == ")
         let textOfExtractedBody = getEmailEditText();
 
         let capitalWords = findCapitalWords(textOfExtractedBody);
-        let misspelledWords = getPossibleMispelledWords(capitalWords);
+        let misspelledWords = await spellCheckInDictionary(capitalWords);
         let capitalSenderWords = getWordsFromSenderEmailText();
-
-        console.log(capitalWords);
+        debugger;
+        console.log(misspelledWords);
         console.log(capitalSenderWords);
         checkWords(textOfExtractedBody, capitalSenderWords, misspelledWords)
     }
@@ -94,33 +99,10 @@ const findCapitalWords = (str) => {
  * function to get mispelledWords
  * return array
  */
-const getPossibleMispelledWords = (words) => {
-    const misspelledWords = [];
-
-    // loop through each word in the text
-    for (let i = 0; i < words.length; i++) {
-        const word = words[i].replace(/[^\w\s]/gi, '');
-        // check if the word is misspelled
-        if (!spellCheckInDictionary(word)) {
-            misspelledWords.push(word);
-        }
-    }
-
-    return misspelledWords;
-}
-
-
-const spellCheckInDictionary = (word) => {
-    // convert the word to lowercase to compare with the dictionary
-    const lowercaseWord = word.toLowerCase();
-
-    // check if the word is in the dictionary
-    if (Dictionary.includes(lowercaseWord)) {
-        return true;
-    }
-
-    // if the word is not in the dictionary, it's misspelled
-    return false;
+const spellCheckInDictionary = async(words) => {
+    var res = [];
+    res = await chrome.runtime.sendMessage({ action: 'check-grammar', words });
+    return res.misWords;
 }
 
 /**

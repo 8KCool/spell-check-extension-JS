@@ -10,10 +10,16 @@
         "120": "./icons/icon-120x120.png"
     },
     "host_permissions": ["*://mail.google.com/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
     "content_scripts": [{
         "matches": ["*://mail.google.com/*"],
         "js": ["content.js"],
         "run_at": "document_end"
     }],
-    "permissions": ["storage"]
+    "permissions": [
+        "storage",
+        "webNavigation"
+    ]
 }
