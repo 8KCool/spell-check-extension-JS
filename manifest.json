@@ -1,36 +1,19 @@
 {
-    "manifest_version": 2,
-    "name": "Gmail Spellcheck",
-    "version": "0.0.0",
-    "background": {
-        "scripts": [
-            "popup.js"
-        ],
-        "persistent": false
-    },
+    "manifest_version": 3,
+    "name": "Gmail Spell Checker",
+    "version": "1.0",
+    "description": "Checks the spelling of words in Gmail.",
     "icons": {
         "16": "./icons/icon-16x16.png",
         "36": "./icons/icon-36x36.png",
         "48": "./icons/icon-48x48.png",
         "120": "./icons/icon-120x120.png"
     },
+    "host_permissions": ["*://mail.google.com/*"],
     "content_scripts": [{
-        "matches": [
-            "<all_urls>"
-        ],
-        "js": [
-            "content-script.js"
-        ]
+        "matches": ["*://mail.google.com/*"],
+        "js": ["content.js"],
+        "run_at": "document_end"
     }],
-    "web_accessible_resources": [
-        "inject-script.js", "contacts.json"
-    ],
-    "browser_action": {
-        "default_popup": "popup.html",
-        "default_title": "PerfWatch"
-    },
-    "permissions": [
-        "tabs",
-        "activeTab"
-    ]
+    "permissions": ["storage"]
 }
