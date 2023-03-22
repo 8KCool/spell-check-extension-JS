@@ -9,17 +9,19 @@
         "48": "./icons/icon-48x48.png",
         "120": "./icons/icon-120x120.png"
     },
-    "host_permissions": ["*://mail.google.com/*"],
     "background": {
         "service_worker": "background.js"
     },
     "content_scripts": [{
         "matches": ["*://mail.google.com/*"],
-        "js": ["content.js"],
+        "js": ["typo-js/typo.js", "content.js"],
         "run_at": "document_end"
     }],
+    "web_accessible_resources": [{
+        "resources": ["typo-js/dictionaries/*"],
+        "matches": ["*://mail.google.com/*"]
+    }],
     "permissions": [
-        "storage",
-        "webNavigation"
+        "tabs", "activeTab"
     ]
 }

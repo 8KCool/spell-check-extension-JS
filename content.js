@@ -1,6 +1,9 @@
 /**
  * load typo.js to check grammaly spelling
  */
+// Function to load the Typo.js library
+
+// const Typo = require("./typo-js/typo");
 
 
 /** ==================================================================================== 
@@ -36,7 +39,14 @@ const processChange = debounce(() => checkSpellText());
  * When gmail.com page is loaded, start checking words spell
  * here we should give delay time because all elements can loaded in a sec.
  */
+var utilityDict = new Typo();
+var affData = utilityDict._readFile(chrome.runtime.getURL('./typo-js/dictionaries/en_US/en_US.aff'));
+var wordData = utilityDict._readFile(chrome.runtime.getURL('./typo-js/dictionaries/en_US/en_US.dic'));
+const dictionary = new Typo('en_US', affData, wordData);
+
 window.onload = function() {
+    // chrome.runtime.sendMessage({ action: 'init-dictionary', langType });
+
     setTimeout(checkSpellText, 3000);
 }
 
@@ -48,16 +58,41 @@ var Dictionary = ["Hello", "Bye", "Best", "Good"]
 const checkSpellText = async() => {
     if (document.getElementsByClassName("oL aDm az9")) {
         console.log(" == start checking spell in Gmail.com == ")
-        let textOfExtractedBody = getEmailEditText();
 
-        let capitalWords = findCapitalWords(textOfExtractedBody);
-        let misspelledWords = await spellCheckInDictionary(capitalWords);
+        // get words array that wrong send spell words from the dictionary
         let capitalSenderWords = getWordsFromSenderEmailText();
-        debugger;
-        console.log(misspelledWords);
-        console.log(capitalSenderWords);
-        checkWords(textOfExtractedBody, capitalSenderWords, misspelledWords)
+        let misSpellSenderWords = spellCheckInDictionary(capitalSenderWords);
+
+        // get words array that wrong edit spell words from the dictionary
+        let textOfExtractedBody = getEmailEditText();
+        let capitalWords = findCapitalWords(textOfExtractedBody);
+        let misSpellEditWords = spellCheckInDictionary(capitalWords);
+
+        console.log("======== wrong spell words from the sender Email =========")
+        console.log(misSpellSenderWords);
+        console.log("======== wrong spell words from the edit Email =========")
+        console.log(misSpellEditWords);
+        checkWords(textOfExtractedBody, misSpellSenderWords, misSpellEditWords)
     }
+}
+
+/**
+ * function to get mispelledWords
+ * return array
+ */
+const spellCheckInDictionary = (words) => {
+    // debugger;
+    // res = await chrome.runtime.sendMessage({ action: 'check-grammar', words });
+    // return res.misWords;
+    // const misspelledWords = dictionary.check(words[0])
+    var res = [];
+    for (var i = 0; i < words.length; i++) {
+        var word = words[i];
+        if (!dictionary.check(word)) {
+            res.push(word);
+        }
+    }
+    return res;
 }
 
 /**
@@ -93,16 +128,6 @@ const findCapitalWords = (str) => {
     const regex = /<[^>]*>([^<]*)/g;
     const wordsArray = str.match(regex).map(match => match.replace(/<\/?[^>]+(>|$)|&nbsp;/g, '').trim().split(/\s+/)).flat().filter(word => word !== "").map(word => word.replace(/[^\w\s]|_/g, "").trim().replace(/\s+/g, " "));
     return wordsArray;
-}
-
-/**
- * function to get mispelledWords
- * return array
- */
-const spellCheckInDictionary = async(words) => {
-    var res = [];
-    res = await chrome.runtime.sendMessage({ action: 'check-grammar', words });
-    return res.misWords;
 }
 
 /**
