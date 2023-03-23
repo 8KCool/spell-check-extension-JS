@@ -157,7 +157,7 @@ const checkWords = (textOfExtractedBody, capitalWordsEmpfaenger, misspelledWords
                     console.log(item + " ist gleich " + itemToSpellcheck + ". Erfolgreich und kein Fehler!")
                 } else {
                     console.log(item + " und " + item + " sind nicht gleich! Fehler!")
-                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'gi'), `<span class="misspelled">${item}</span>`);
+                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'gi'), `<span class="misspelled" data="${itemToSpellcheck}">${item}</span>`);
                     extractedTextBodyCompose.innerHTML = newContent
                     textOfExtractedBody = extractedTextBodyCompose.innerHTML
                 }
@@ -180,10 +180,9 @@ document.addEventListener('click', function(event) {
             document.querySelector(".spellcheck-modal").remove();
         }
         var selectedElement = event.target;
-        const mispelledWord = selectedElement.textContent;
         selectedElement.classList.remove("misspelled-select")
         selectedElement.classList.add("misspelled-select")
-        document.body.appendChild(makeMiniModal(selectedElement, mispelledWord));
+        document.body.appendChild(makeMiniModal(selectedElement));
     } else {
         if (!event.target.classList.contains('misspelled')) {
             if (document.querySelector(".misspelled-select")) {
@@ -224,14 +223,16 @@ const makeMiniModal = (selectedElement) => {
     modalBody.className = "modal-body"
 
     // Populate modal with suggestions
-    const suggestions = ['suggestion 1', 'suggestion 2', 'suggestion 3', 'suggestion 2', 'suggestion 3'];
+    var correctWord = selectedElement.getAttribute('data');
+    const suggestions = [];
+    suggestions.push(correctWord);
     suggestions.forEach(function(suggestion) {
         const button = document.createElement('button');
         button.className = "suggestion-button"
         button.textContent = suggestion;
         button.addEventListener('click', function(event) {
             // Replace misspelled word with suggestion
-            event.target.textContent = suggestion;
+            selectedElement.textContent = suggestion;
             miniModal.remove();
         });
         modalBody.appendChild(button);
