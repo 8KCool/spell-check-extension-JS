@@ -1,3 +1,75 @@
 .misspelled {
     border-bottom: 2px solid black;
 }
+
+.misspelled:active {
+    background-color: rgb(252, 160, 75);
+}
+
+.misspelled-select {
+    background-color: rgb(252, 160, 75);
+}
+
+.spellcheck-modal {
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    background-color: white;
+    min-width: 257px;
+    max-width: 400px;
+    min-height: 144px;
+    z-index: 2000;
+    border-radius: 3px;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 15px;
+    line-height: 15px;
+    border: 1px solid lightgray;
+}
+
+.spellcheck-modal .modal-header {
+    background-color: white;
+    height: 35px;
+    vertical-align: middle;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 14px 11px 0px 16px;
+}
+
+.spellcheck-modal .modal-body {
+    background-color: white;
+    padding: 0px 11px 0px 16px;
+}
+
+.spellcheck-modal .suggestion-button {
+    background: #4A9AF7;
+    border-radius: 4px;
+    padding-top: 14px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    /* padding: 14px 11px 14px 16px; */
+    font-size: 12px;
+    line-height: 15px;
+    color: white;
+    padding: 8px 16px;
+    border: none !important;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.spellcheck-modal .modal-footer {
+    background-color: white;
+    padding: 14px;
+    margin-top: 15px;
+    border-top: 1px solid lightgray;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    vertical-align: middle;
+}
+
+.spellcheck-modal .modal-footer:before {
+    content: '×';
+    font-size: 18px;
+    font-weight: 700;
+    margin-right: 3px;
+    color: black;
+}

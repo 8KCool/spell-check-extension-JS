@@ -138,8 +138,15 @@ const findCapitalWords = (str) => {
  */
 const checkWords = (textOfExtractedBody, capitalWordsEmpfaenger, misspelledWords) => {
     let extractedTextBodyCompose = document.getElementsByClassName("Am Al editable LW-avf tS-tW")[0]
+
+    // remove all span tag "misspelled, if don't remove, span tag will remain"
+    var regex = /<\/?span\b[^>]*>/ig;
+    textOfExtractedBody = textOfExtractedBody.replace(regex, '');
+
     for (let i = 0; i < misspelledWords.length; i++) {
         var item = misspelledWords[i];
+
+
         for (let x = 0; x < capitalWordsEmpfaenger.length; x++) {
             var itemToSpellcheck = capitalWordsEmpfaenger[x]
             if (item.charAt(0).toLowerCase() === itemToSpellcheck.charAt(0).toLowerCase() &&
@@ -157,4 +164,90 @@ const checkWords = (textOfExtractedBody, capitalWordsEmpfaenger, misspelledWords
             }
         }
     }
+}
+
+
+/**
+ * requirement V1
+ *  - point
+ *    * when user click misspelled word, highlight this word.
+ *    * show mini modal to fix it.
+ */
+document.addEventListener('click', function(event) {
+    // Check if the clicked element has the desired class attribute
+    if (event.target.classList.contains('misspelled')) {
+        if (document.querySelector(".spellcheck-modal")) {
+            document.querySelector(".spellcheck-modal").remove();
+        }
+        var selectedElement = event.target;
+        const mispelledWord = selectedElement.textContent;
+        selectedElement.classList.remove("misspelled-select")
+        selectedElement.classList.add("misspelled-select")
+        document.body.appendChild(makeMiniModal(selectedElement, mispelledWord));
+    } else {
+        if (!event.target.classList.contains('misspelled')) {
+            if (document.querySelector(".misspelled-select")) {
+                document.querySelector(".misspelled-select").classList.remove("misspelled-select")
+            }
+        }
+        if (!event.target.classList.contains('spellcheck-modal')) {
+            if (document.querySelector(".spellcheck-modal")) {
+                document.querySelector(".spellcheck-modal").remove();
+            }
+        }
+    }
+
+});
+
+
+/**
+ * mini modal to show misspelled state and fix
+ */
+
+const makeMiniModal = (selectedElement) => {
+    // mini modal
+    var miniModal = document.createElement('div');
+    miniModal.className = 'spellcheck-modal';
+
+    var elementRect = selectedElement.getBoundingClientRect();
+    miniModal.style.position = 'absolute';
+    miniModal.style.top = (elementRect.bottom + window.pageYOffset + 5) + 'px';
+    miniModal.style.left = (elementRect.left + window.pageXOffset) + 'px';
+
+
+    const modalHeader = document.createElement('div');
+    modalHeader.className = "modal-header"
+    modalHeader.textContent = 'Possible spelling mistake found.';
+    miniModal.appendChild(modalHeader);
+
+    const modalBody = document.createElement('div');
+    modalBody.className = "modal-body"
+
+    // Populate modal with suggestions
+    const suggestions = ['suggestion 1', 'suggestion 2', 'suggestion 3', 'suggestion 2', 'suggestion 3'];
+    suggestions.forEach(function(suggestion) {
+        const button = document.createElement('button');
+        button.className = "suggestion-button"
+        button.textContent = suggestion;
+        button.addEventListener('click', function(event) {
+            // Replace misspelled word with suggestion
+            event.target.textContent = suggestion;
+            miniModal.remove();
+        });
+        modalBody.appendChild(button);
+    });
+
+    miniModal.appendChild(modalBody);
+
+    const modalFooter = document.createElement('div');
+    modalFooter.className = "modal-footer"
+    modalFooter.textContent = 'Ignore';
+    modalFooter.addEventListener('click', function(event) {
+        // Replace misspelled word with suggestion
+        alert("Ignore")
+        miniModal.remove();
+    });
+    miniModal.appendChild(modalFooter);
+
+    return miniModal;
 }
