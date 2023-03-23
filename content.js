@@ -1,10 +1,9 @@
 /**
- * load typo.js to check grammaly spelling
+ * typeTest = 0 : real function
+ * typeTest = 1 : test function
  */
-// Function to load the Typo.js library
 
-// const Typo = require("./typo-js/typo");
-
+const typeTest = 1
 
 /** ==================================================================================== 
  * A debounce function makes sure that your code is only triggered once per user input.
@@ -151,10 +150,8 @@ const checkWords = (textOfExtractedBody, capitalWordsEmpfaenger, misspelledWords
                     console.log(item + " ist gleich " + itemToSpellcheck + ". Erfolgreich und kein Fehler!")
                 } else {
                     console.log(item + " und " + item + " sind nicht gleich! Fehler!")
-                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'gi'), `<span style="background-color: red;">${item}</span>`);
-                    var position = newContent.indexOf(`<span style="background-color: red;">${item}</span>`);
+                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'gi'), `<span class="misspelled">${item}</span>`);
                     extractedTextBodyCompose.innerHTML = newContent
-                    extractedTextBodyCompose.selectionStart = extractedTextBodyCompose.selectionEnd = position;
                     textOfExtractedBody = extractedTextBodyCompose.innerHTML
                 }
             }
