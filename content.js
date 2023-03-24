@@ -4,6 +4,7 @@
  */
 
 const typeTest = 1
+let ignoreWords = [];
 
 /** ==================================================================================== 
  * A debounce function makes sure that your code is only triggered once per user input.
@@ -136,28 +137,37 @@ const findCapitalWords = (str) => {
  *    * capitalWordEmpfaenger: words list from text Of Extracted Body
  *    * capitalWords: words list from email edit element
  */
-const checkWords = (textOfExtractedBody, capitalWordsEmpfaenger, misspelledWords) => {
+const checkWords = (textOfExtractedBody, capitalSenderWords, misspelledWords1) => {
     let extractedTextBodyCompose = document.getElementsByClassName("Am Al editable LW-avf tS-tW")[0]
 
     // remove all span tag "misspelled, if don't remove, span tag will remain"
     var regex = /<\/?span\b[^>]*>/ig;
     textOfExtractedBody = textOfExtractedBody.replace(regex, '');
 
+    const misspelledWords = misspelledWords1.reduce((acc, current) => {
+        if (!acc.includes(current)) {
+            acc.push(current);
+        }
+        return acc;
+    }, []);
+
     for (let i = 0; i < misspelledWords.length; i++) {
         var item = misspelledWords[i];
 
 
-        for (let x = 0; x < capitalWordsEmpfaenger.length; x++) {
-            var itemToSpellcheck = capitalWordsEmpfaenger[x]
+        for (let x = 0; x < capitalSenderWords.length; x++) {
+            var itemToSpellcheck = capitalSenderWords[x]
             if (item.charAt(0).toLowerCase() === itemToSpellcheck.charAt(0).toLowerCase() &&
                 item.charAt(item.length - 1).toLowerCase() === itemToSpellcheck.charAt(itemToSpellcheck.length - 1).toLowerCase() &&
                 item.length == itemToSpellcheck.length) {
 
-                if (item === itemToSpellcheck) {
+                if (ignoreWords.indexOf(item) != -1) { // already ignored word
+                    console.log(item + " is ignored")
+                } else if (capitalSenderWords.indexOf(item) != -1) { // exist in sender email box
                     console.log(item + " ist gleich " + itemToSpellcheck + ". Erfolgreich und kein Fehler!")
                 } else {
                     console.log(item + " und " + item + " sind nicht gleich! Fehler!")
-                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'gi'), `<span class="misspelled" data="${itemToSpellcheck}">${item}</span>`);
+                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'g'), `<span class="misspelled" data="${itemToSpellcheck}">${item}</span>`);
                     extractedTextBodyCompose.innerHTML = newContent
                     textOfExtractedBody = extractedTextBodyCompose.innerHTML
                 }
@@ -224,6 +234,7 @@ const makeMiniModal = (selectedElement) => {
 
     // Populate modal with suggestions
     var correctWord = selectedElement.getAttribute('data');
+    var misspelledWord = selectedElement.textContent
     const suggestions = [];
     suggestions.push(correctWord);
     suggestions.forEach(function(suggestion) {
@@ -233,6 +244,8 @@ const makeMiniModal = (selectedElement) => {
         button.addEventListener('click', function(event) {
             // Replace misspelled word with suggestion
             selectedElement.textContent = suggestion;
+            selectedElement.classList.remove("misspelled-select")
+            selectedElement.classList.remove("misspelled")
             miniModal.remove();
         });
         modalBody.appendChild(button);
@@ -245,7 +258,9 @@ const makeMiniModal = (selectedElement) => {
     modalFooter.textContent = 'Ignore';
     modalFooter.addEventListener('click', function(event) {
         // Replace misspelled word with suggestion
-        alert("Ignore")
+        ignoreWords.push(misspelledWord);
+        selectedElement.classList.remove("misspelled-select")
+        selectedElement.classList.remove("misspelled")
         miniModal.remove();
     });
     miniModal.appendChild(modalFooter);
