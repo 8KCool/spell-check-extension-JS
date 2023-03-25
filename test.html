@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test content.js</title>
+    <script type="text/javascript" async="" src="typo-js/typo.js"></script>
+    <script type="text/javascript" async="" src="content.js"></script>
+</head>
+
+<body>
+    <h2>
+        1 spellCheckInDictionary(capitalSenderWords)
+    </h2>
+    <h4>
+        input: capitalSenderWords array <br> output: misspelledWords array
+    </h4>
+    input capital words array(Bogdan, Sine, Shine,...)<input id="capitalSenderWords" type="text">
+    <input type="button" id="btnCheckSpell" onclick="checkSpellHere()" value="check" /> <br>
+    <h4>
+        output-misspellwords: <span id="outputSpell"></span>
+    </h4>
+</body>
+
+<script>
+    function checkSpellHere() {
+        var input = [];
+        input.push("ef");
+        input.push("ksdf");
+        input.push("efsd");
+        input.push("esdff");
+        var output = spellCheckInDictionary(input);
+        debugger;
+        console.log(output);
+    }
+</script>
+
+</html>

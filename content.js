@@ -140,9 +140,19 @@ const findCapitalWords = (str) => {
 const checkWords = (textOfExtractedBody, capitalSenderWords, misspelledWords1) => {
     let extractedTextBodyCompose = document.getElementsByClassName("Am Al editable LW-avf tS-tW")[0]
 
-    // remove all span tag "misspelled, if don't remove, span tag will remain"
-    var regex = /<\/?span\b[^>]*>/ig;
-    textOfExtractedBody = textOfExtractedBody.replace(regex, '');
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const cursorPosition = range.startOffset;
+
+    // Save the current selection
+    const savedSelection = saveSelection(extractedTextBodyCompose);
+
+    console.log(savedSelection);
+    if (textOfExtractedBody.search("<span") != -1) {
+        var regex = /<\/?span\b[^>]*>/ig;
+        textOfExtractedBody = textOfExtractedBody.replace(regex, '');
+        extractedTextBodyCompose.innerHTML = textOfExtractedBody
+    }
 
     const misspelledWords = misspelledWords1.reduce((acc, current) => {
         if (!acc.includes(current)) {
@@ -154,28 +164,108 @@ const checkWords = (textOfExtractedBody, capitalSenderWords, misspelledWords1) =
     for (let i = 0; i < misspelledWords.length; i++) {
         var item = misspelledWords[i];
 
-
         for (let x = 0; x < capitalSenderWords.length; x++) {
-            var itemToSpellcheck = capitalSenderWords[x]
-            if (item.charAt(0).toLowerCase() === itemToSpellcheck.charAt(0).toLowerCase() &&
-                item.charAt(item.length - 1).toLowerCase() === itemToSpellcheck.charAt(itemToSpellcheck.length - 1).toLowerCase() &&
-                item.length == itemToSpellcheck.length) {
+            var itemCorrectWord = capitalSenderWords[x]
+            if (item.charAt(0).toLowerCase() === itemCorrectWord.charAt(0).toLowerCase() &&
+                item.charAt(item.length - 1).toLowerCase() === itemCorrectWord.charAt(itemCorrectWord.length - 1).toLowerCase() &&
+                item.length == itemCorrectWord.length) {
 
                 if (ignoreWords.indexOf(item) != -1) { // already ignored word
                     console.log(item + " is ignored")
-                } else if (capitalSenderWords.indexOf(item) != -1) { // exist in sender email box
-                    console.log(item + " ist gleich " + itemToSpellcheck + ". Erfolgreich und kein Fehler!")
+                        // } else if (capitalSenderWords.indexOf(item) != -1) { // exist in sender email box
+                } else if (capitalSenderWords.findIndex(word => word.toLowerCase() === item.toLowerCase()) != -1) { // exist in sender email box
+                    console.log(item + " is exist in sender Email words list")
                 } else {
-                    console.log(item + " und " + item + " sind nicht gleich! Fehler!")
-                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'g'), `<span class="misspelled" data="${itemToSpellcheck}">${item}</span>`);
+                    console.log(item + " is misspelled word. will be changed")
+                    itemCorrectWord = getCorrectWord(itemCorrectWord, item);
+                    var newContent = textOfExtractedBody.replace(new RegExp(item, 'g'), `<span class="misspelled" data="${itemCorrectWord}">${item}</span>`);
                     extractedTextBodyCompose.innerHTML = newContent
                     textOfExtractedBody = extractedTextBodyCompose.innerHTML
                 }
             }
         }
     }
+    restoreSelection(extractedTextBodyCompose, savedSelection, cursorPosition);
+
 }
 
+function saveSelection(element) {
+    const range = window.getSelection().getRangeAt(0);
+    const preSelectionRange = range.cloneRange();
+    preSelectionRange.selectNodeContents(element);
+    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+    const start = preSelectionRange.toString().length;
+    return {
+        start: start,
+        end: start + range.toString().length,
+    };
+}
+
+function restoreSelection(element, savedSelection, cursorPosition) {
+    let charIndex = 0;
+    const range = document.createRange();
+    range.setStart(element, 0);
+    range.collapse(true);
+    const nodeStack = [element];
+    let node;
+    let foundStart = false;
+    let stop = false;
+
+    while (!stop && (node = nodeStack.pop())) {
+        if (node.nodeType == 3) {
+            const nextCharIndex = charIndex + node.length;
+            if (!foundStart && savedSelection.start >= charIndex && savedSelection.start <= nextCharIndex) {
+                range.setStart(node, savedSelection.start - charIndex);
+                foundStart = true;
+            }
+            if (foundStart && savedSelection.end >= charIndex && savedSelection.end <= nextCharIndex) {
+                range.setEnd(node, savedSelection.end - charIndex);
+                stop = true;
+            }
+            charIndex = nextCharIndex;
+        } else {
+            let i = node.childNodes.length;
+            while (i--) {
+                nodeStack.push(node.childNodes[i]);
+            }
+        }
+    }
+
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // Set the cursor position
+    const newRange = document.createRange();
+    newRange.setStart(selection.anchorNode, cursorPosition);
+    newRange.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+}
+
+
+/**
+ * 
+ * misword: bogdon,
+ * correct: Bogdan,
+ * output: bogdan 
+ */
+const getCorrectWord = (correctWord, misWord) => {
+    let str1Lower = correctWord.toLowerCase();
+    let str2Lower = misWord.toLowerCase();
+    let result = "";
+    for (let i = 0; i < correctWord.length; i++) {
+        // Compare the characters in a case-insensitive way
+        if (str1Lower.charAt(i) !== str2Lower.charAt(i)) {
+            // Use the character from the second string if they differ
+            result += correctWord.charAt(i);
+        } else {
+            // Otherwise, use the character from the first string
+            result += misWord.charAt(i);
+        }
+    }
+    return result;
+}
 
 /**
  * requirement V1
@@ -212,7 +302,6 @@ document.addEventListener('click', function(event) {
 /**
  * mini modal to show misspelled state and fix
  */
-
 const makeMiniModal = (selectedElement) => {
     // mini modal
     var miniModal = document.createElement('div');
