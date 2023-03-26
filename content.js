@@ -14,6 +14,7 @@ let ignoreWords = [];
  * When a key event occurs, the debounce function is called.
  */
 document.addEventListener("keydown", function(event) {
+    var keyValue = event.key;
     processChange();
 });
 
@@ -60,18 +61,26 @@ const checkSpellText = async() => {
         console.log(" == start checking spell in Gmail.com == ")
 
         // get words array that wrong send spell words from the dictionary
-        let capitalSenderWords = getWordsFromSenderEmailText();
-        let misSpellSenderWords = spellCheckInDictionary(capitalSenderWords);
-
-        // get words array that wrong edit spell words from the dictionary
+        let senderEmailText = getEmailText();
+        console.log("======== senderEmailText ===========");
+        console.log(senderEmailText);
         let textOfExtractedBody = getEmailEditText();
-        let capitalWords = findCapitalWords(textOfExtractedBody);
-        let misSpellEditWords = spellCheckInDictionary(capitalWords);
+        console.log("========== editEmailText =============");
+        console.log(textOfExtractedBody);
 
+        let capitalEditWords = findCapitalWords(textOfExtractedBody);
+        let capitalSenderWords = findCapitalWords(senderEmailText);
+
+
+        let misSpellSenderWords = spellCheckInDictionary(capitalSenderWords);
         console.log("======== wrong spell words from the sender Email =========")
         console.log(misSpellSenderWords);
+
+        // get words array that wrong edit spell words from the dictionary
+        let misSpellEditWords = spellCheckInDictionary(capitalEditWords);
         console.log("======== wrong spell words from the edit Email =========")
         console.log(misSpellEditWords);
+
         checkWords(textOfExtractedBody, misSpellSenderWords, misSpellEditWords)
     }
 }
@@ -111,12 +120,17 @@ const getEmailEditText = () => {
  * function to get text from sender email tag
  * return: array
  */
-const getWordsFromSenderEmailText = () => {
+const getEmailText = () => {
     if (document.getElementsByClassName("a3s aiL ") && document.getElementsByClassName("a3s aiL ")[0].children && document.getElementsByClassName("a3s aiL ")[0].children[0]) {
         let extractedAbsenderBody = document.getElementsByClassName("a3s aiL ")[0].children[0].outerHTML
-        return capitalWords = findCapitalWords(extractedAbsenderBody);
+        return extractedAbsenderBody;
     }
     return "";
+    // if (document.getElementsByClassName("a3s aiL ") && document.getElementsByClassName("a3s aiL ")[0].children && document.getElementsByClassName("a3s aiL ")[0].children[0]) {
+    //     let extractedAbsenderBody = document.getElementsByClassName("a3s aiL ")[0].children[0].outerHTML
+    //     return capitalWords = findCapitalWords(extractedAbsenderBody);
+    // }
+    // return "";
 }
 
 /**
@@ -163,7 +177,6 @@ const checkWords = (textOfExtractedBody, capitalSenderWords, misspelledWords1) =
 
     for (let i = 0; i < misspelledWords.length; i++) {
         var item = misspelledWords[i];
-
         for (let x = 0; x < capitalSenderWords.length; x++) {
             var itemCorrectWord = capitalSenderWords[x]
             if (item.charAt(0).toLowerCase() === itemCorrectWord.charAt(0).toLowerCase() &&
@@ -210,7 +223,6 @@ function restoreSelection(element, savedSelection, cursorPosition) {
     let node;
     let foundStart = false;
     let stop = false;
-
     while (!stop && (node = nodeStack.pop())) {
         if (node.nodeType == 3) {
             const nextCharIndex = charIndex + node.length;
